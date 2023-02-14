@@ -1,0 +1,9 @@
+google-api-python-client
+google-auth
+google-cloud-dns
+google-cloud-logging
+google-oauth
+python-dotenv
+
+# Not necessary to run in Google Cloud Functions
+functions-framework==3.*

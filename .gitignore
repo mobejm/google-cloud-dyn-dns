@@ -1,0 +1,8 @@
+# MacOS ლ( `Д’ ლ)
+.DS_Store
+
+# Python Virtual Environment
+venv/
+
+# Local testing
+.env
