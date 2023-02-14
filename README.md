@@ -73,7 +73,12 @@ For local testing, creating a virtual environment is suggested:
     PROJECT_ID=project-id
     AUTH_KEY_JSON_FILE_PATH=/path/to/auth/file.json
     ```
-1. The Auth Key file can be created/downloaded for the same Service Account that will be used to run the function in the cloud.
+1. The Auth Key file can be [created/downloaded](https://console.cloud.google.com/iam-admin/serviceaccounts) for the same Service Account that will be used to run the function in the cloud.
+    ```
+    IAM & Admin -> Service Accounts -> {Service Account} -> Keys -> ADD KEY
+    ```
+    For security reasons, it's generally advised against using Service Accounts for running tools or services outside of Google Cloud. Simply the act of downloading a Service Account `key` is considered a security risk. [`Workload Identity federation`](https://cloud.google.com/iam/docs/workload-identity-federation) is a good alternative in this case. You can find more information about how to choose the best authentication method in [here](https://cloud.google.com/blog/products/identity-security/how-to-authenticate-service-accounts-to-help-keep-applications-secure).
+
 1. Start the Functions Framework
     ```
     functions-framework --target=update_dns_a_record
@@ -131,6 +136,3 @@ For local testing, creating a virtual environment is suggested:
 | DNS_ZONE_NAME           | Name of the DNS Zone.                                              |
 | DNS_DOMAIN              | Domain name.                                                       |
 | DNS_RECORD_DEFAULT_TTL  | (Optional) Default TTL for DNS A records. 300 sec if not provided. |
-
-### 5.3 Deploying with `gcloud`
-

@@ -12,8 +12,6 @@ from google.oauth2.service_account import Credentials
 from ipaddress import ip_address, IPv4Address
 from pathlib import Path
 
-# https://cloud.google.com/blog/products/identity-security/how-to-authenticate-service-accounts-to-help-keep-applications-secure?_ga=2.101729538.-282408695.1674885064
-
 # Google Functions Framework:
 #   https://github.com/GoogleCloudPlatform/functions-framework-python
 # Google Cloud DNS v1 API Reference:
@@ -23,6 +21,7 @@ from pathlib import Path
 # Based on: Python3 Google Cloud DNS Updater
 #   https://github.com/ianbrown78/google-dns-updater
 
+# This is the IP Address that signals the intent to delete the A record
 delete_ip_address = "0.0.0.0"
 
 cfg = config.config()
