@@ -28,7 +28,6 @@ cfg = config.config()
 logging_client = google.cloud.logging.Client(project=cfg.project_id, credentials=cfg.credentials)
 logger = logging_client.logger("update_dns_a_record")
 dns_client = dns.Client(project=cfg.project_id, credentials=cfg.credentials)
-zone = dns_client.zone(name=cfg.zone_name, dns_name=cfg.dns_domain)
 
 @functions_framework.http
 def update_dns_a_record(request):
@@ -36,11 +35,13 @@ def update_dns_a_record(request):
     request_json = request.get_json()
     logger.log_struct(request_json, severity="INFO")
 
+    zone_name = request_json.get('zone_name', None)
+    zone_dns_name = request_json.get('zone_dns_name', None)
     hostname = request_json.get('hostname', None)
     ip_address = request_json.get('ip_address', None)
 
-    if not hostname or not ip_address:
-        return http_invalid_request("Hostname and IP address are required.")
+    if not zone_name or not zone_dns_name or not hostname or not ip_address:
+        return http_invalid_request("Zone Name, Zone DNS Name, Hostname and IP address are required.")
 
     if not (is_valid_ipv4_address(ip_address)):
         return http_invalid_request(f"Provided IPv4 address ({ip_address}) is not valid.")
@@ -49,8 +50,9 @@ def update_dns_a_record(request):
     response_status = 200
 
     try:
+        zone = dns_client.zone(name=zone_name, dns_name=zone_dns_name)
         if not (zone.exists()):
-            return http_not_found(f"DNS Zone {cfg.zone_name} doesn't exist.")
+            return http_not_found(f"DNS Zone {zone_name} doesn't exist.")
             
         changes = zone.changes()
         existing_a_record = get_a_record(hostname, zone)
@@ -92,13 +94,15 @@ def update_dns_a_record(request):
         execute_change_set(changes)
 
     except Exception as error:
-        logger.log_text(error, severity="ERROR")
+        logger.log_text(str(error), severity="ERROR")
         return http_error_response(f'An error occurred: {error}', 500)
 
     response_data = ""
     if new_a_record:
         response_data = {
             'dns_record': {
+                'zone_name': zone_name,
+                'zone_dns_name': zone_dns_name,
                 'name': new_a_record.name,
                 'type': new_a_record.record_type,
                 'ttl': new_a_record.ttl,

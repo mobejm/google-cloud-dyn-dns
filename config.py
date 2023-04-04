@@ -15,8 +15,6 @@ class config():
             load_dotenv(dotenv_path=env_path)
 
         # Mandatory environment variables
-        self.zone_name = os.environ.get('DNS_ZONE_NAME')
-        self.dns_domain = os.environ.get('DNS_DOMAIN')
         self.dns_record_ttl = os.environ.get('DNS_RECORD_DEFAULT_TTL', 300)
 
         # Required for local testing

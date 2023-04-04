@@ -1,6 +1,6 @@
 # Google Cloud Dynamic DNS
 
-This python script can be deployed to Google Cloud Functions to serve requests from an on-prem client in order to update the DNS A record for a given DNS Zone/Domain. The client is expected to provide the DNS hostname and IPv4 address to create/update the corresponding DNS record.
+This python script is meant be deployed to Google Cloud Functions to serve requests from an on-prem client in order to update the DNS A record for a given DNS Zone/Domain. The client is expected to provide the DNS hostname and IPv4 address to create/update the corresponding DNS record.
 
 It uses te official [Python Functions Framework](https://github.com/GoogleCloudPlatform/functions-framework-python) from Google Cloud.
 
@@ -8,13 +8,17 @@ It uses te official [Python Functions Framework](https://github.com/GoogleCloudP
 
 ### 1.1 Parameters
 
-- **hostname** (REQUIRED). DNS name of the A record to be updated.
+- **zone_name** (REQUIRED). Name of the Google Cloud zone.
+- **zone_dns_name** (REQUIRED). DNS name of the Google Cloud zone.
+- **hostname** (REQUIRED). Name of the DNS A record to be updated.
 - **ip_address** (REQUIRED). IPv4 address for the A record. Providing the IP address "0.0.0.0" will result in the deletion of the DNS A record if one exists.
 
 Example:
 ```
 {
-    "hostname": "mydomain.com.",
+    "zone_name": "mydomain-com",
+    "zone_dns_name": "mydomain.com.",
+    "hostname": "host.mydomain.com.",
     "ip_address": "X.X.X.X"      # A Public IPv4 address
 }
 ```
@@ -34,7 +38,9 @@ Example:
     "message": "DNS A record already exists with the specified IPv4 address.",
     "data": {
         "dns_record": {
-            "name": "mydomain.com.",
+            "zone_name": "mydomain-com",
+            "zone_dns_name": "mydomain.com.",
+            "name": "host.mydomain.com.",
             "type": "A",
             "ttl": 300,
             "rrdatas": ["X.X.X.X"],
@@ -67,8 +73,6 @@ For local testing, creating a virtual environment is suggested:
     ```
 1. Create an `.env` file with the following information:
     ```
-    DNS_ZONE_NAME=zone-name
-    DNS_DOMAIN=domain.com
     DNS_RECORD_DEFAULT_TTL=300
     PROJECT_ID=project-id
     AUTH_KEY_JSON_FILE_PATH=/path/to/auth/file.json
@@ -88,6 +92,8 @@ For local testing, creating a virtual environment is suggested:
     curl -X POST localhost:8080 \
        -H "Content-Type: application/json" \
        -d '{
+        "zone_name" : "domain-com",
+        "zone_dns_name" : "domain.com.",
 	    "hostname" : "subdomain.domain.com.",
 	    "ip_address" : "X.X.X.X"
     }'
@@ -133,6 +139,6 @@ For local testing, creating a virtual environment is suggested:
 
 | Variable                | Description                                                        |
 | ----------------------- | :----------------------------------------------------------------- |
-| DNS_ZONE_NAME           | Name of the DNS Zone.                                              |
-| DNS_DOMAIN              | Domain name.                                                       |
+| PROJECT_ID              | (Only needed for local testing)                                    |
+| AUTH_KEY_JSON_FILE_PATH | (Only needed for local testing)                                    |
 | DNS_RECORD_DEFAULT_TTL  | (Optional) Default TTL for DNS A records. 300 sec if not provided. |
